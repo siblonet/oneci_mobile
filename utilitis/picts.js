@@ -1,9 +1,18 @@
+export const avatar = require("../assets/icons/avatay.png");
+
+
 export const logo = require("../assets/icons/logo.png");
+
+
+
+export const fingerprint = require("../assets/icons/fingerprint.png");
+export const faceid = require("../assets/icons/faceid.png");
+
 
 
 export default {
     // A
-
+    avatar,
 
     // B
 
@@ -25,8 +34,8 @@ export default {
 
 
     // F
-
-
+    fingerprint,
+    faceid,
 
 
     // G

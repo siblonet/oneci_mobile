@@ -1,5 +1,5 @@
 import * as SQLite from 'expo-sqlite';
 
-export const Memory = {
-  getCourier: () => SQLite.openDatabase("nuanceuser.db"),
+export const Instapay = {
+  getOneci: () => SQLite.openDatabase("oneci.db"),
 };
