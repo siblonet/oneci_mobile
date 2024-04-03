@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { StyleSheet, Text, View, Image, TouchableOpacity, Dimensions } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, Dimensions, TextInput, ActivityIndicator } from 'react-native';
 import {
-    Ionicons
+    Ionicons, MaterialCommunityIcons
 } from '@expo/vector-icons';
 import { picts } from "../utilitis";
 import { StatusBar } from 'expo-status-bar';
@@ -9,6 +9,8 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Instapay } from '../database/database';
 import { useFocusEffect } from "@react-navigation/native"
 import axios from "axios";
+import Cameran from './camerarunna';
+import * as FileSystem from 'expo-file-system';
 
 const HEIGHT = Dimensions.get("window").height;
 
@@ -19,6 +21,8 @@ export default function DashBoard({ navigation }) {
     const [token, setToken] = useState();
     const [instapaytoken, setInstapaytoken] = useState();
     const [tackpi, setTackpi] = useState(false);
+    const [capturedImage, setCapturedImage] = useState(null);
+    const [nni, setNni] = useState();
 
 
     useFocusEffect(
@@ -35,6 +39,7 @@ export default function DashBoard({ navigation }) {
                                 []);
                             setIsLoaded(false);
                             console.log("deleted and created");
+                            navigation.navigate("Connexion");
 
                         } else {
                             txn.executeSql(
@@ -63,12 +68,42 @@ export default function DashBoard({ navigation }) {
     );
 
 
+
+
+
+
+    const verificationRequest = async () => {
+        setIsLoaded(false);
+        if (nni && capturedImage) {
+            try {
+                const base64 = await FileSystem.readAsStringAsync(capturedImage, { encoding: FileSystem.EncodingType.Base64 });
+
+                const identity = {
+                    NNI: nni,
+                    BIOMETRIC_TYPE: "AUTH_FACE",
+                    BIOMETRIC_TYPE: base64
+                };
+
+                const setting = { headers: { 'Authorization': `Bearer ${instapaytoken}` } };
+
+                axios.post(`${routx.rnppUrl}/oneci/face-auth`, identity, setting).then(answ => {
+                    console.log(answ.data);
+                    setIsLoaded(false);
+                }).catch(error => {
+                    setIsLoaded(false);
+
+                });
+            } catch (error) {
+                console.error("Error converting image to base64:", error);
+            }
+
+        }
+    };
+
     return (
         <>
             {tackpi ?
-                <View style={{}}>
-
-                </View>
+                <Cameran tackpi={setTackpi} setCapturedImage={setCapturedImage} />
                 :
 
                 <LinearGradient style={hilai.container}
@@ -105,13 +140,15 @@ export default function DashBoard({ navigation }) {
                     </LinearGradient>
 
                     <View style={{
-                        width: "60%",
-                        height: "45%",
-                        borderRadius: 120,
+                        width: capturedImage ? "70%" : "60%",
+                        height: capturedImage ? "40%" : "45%",
+                        borderRadius: capturedImage ? 25 : 120,
+                        overflow: capturedImage ? "hidden" : "visible",
+
                     }}>
                         <Image
-                            source={picts.faceid}
-                            resizeMode="center"
+                            source={capturedImage ? { uri: capturedImage } : picts.faceid}
+                            resizeMode={capturedImage ? "cover" : "contain"}
                             style={{
                                 width: "100%",
                                 height: "100%",
@@ -121,35 +158,123 @@ export default function DashBoard({ navigation }) {
 
                     <View style={{ height: 50 }}>
                     </View>
+                    {capturedImage ?
+                        <>
 
-                    <LinearGradient
-                        style={
-                            {
-                                width: "80%",
-                                height: 40,
-                                borderRadius: 10,
-                                elevation: 2,
-                                alignItems: "center",
-                                justifyContent: "center"
-                            }
-                        }
-                        //colors={["#99e6ae", "#009de0", "#28094d", "#00b395"]}
-                        colors={["#f4a3af", "#28094d", "#00b395"]}
-                        start={{ x: 0, y: 1 }}
-                        end={{ x: 1, y: 1 }}
-                    >
-                        <TouchableOpacity style={
-                            {
-                                height: "100%",
-                                width: "100%",
-                                alignItems: "center",
-                                justifyContent: "center"
-                            }
-                        } onPress={() => navigation.navigate("Cameran")}>
-                            <Text style={{ color: "#fff", fontSize: 18, letterSpacing: 7 }}>Procéder</Text>
-                        </TouchableOpacity>
+                            <View style={{
+                                height: 50,
+                                width: "90%",
+                                backgroundColor: "#ffffff",
+                                borderRadius: 11,
+                                alignItems: 'center',
+                                flexDirection: 'row',
+                                paddingHorizontal: "2%",
+                                justifyContent: "space-between",
+                                shadowOffset: {
+                                    width: 0,
+                                    height: 5
+                                },
+                                shadowOpacity: 0.4,
+                                shadowColor: '#000',
+                                elevation: 4
+                            }}>
+                                <View style={{ height: 30, width: 30 }}>
+                                    <Image
+                                        source={picts.avatar}
+                                        resizeMode="center"
+                                        style={{
+                                            width: "100%",
+                                            height: "100%",
+                                        }}
+                                    />
+                                </View>
 
-                    </LinearGradient>
+                                <TextInput style={{
+                                    backgroundColor: 'transparent',
+                                    fontSize: 17,
+                                    height: 30,
+                                    width: "80%",
+                                    color: '#aaa',
+                                }}
+                                    placeholderTextColor={'#aaa'}
+                                    placeholder={'Numéro NNI'}
+                                    value={nni}
+                                    keyboardType="phone-pad"
+                                    onChangeText={text => setNni(text)}
+                                />
+
+                                <MaterialCommunityIcons name="id-card" size={20} color={'#eee'} />
+                            </View>
+
+                            <View style={{ height: 35 }}>
+                            </View>
+                            <LinearGradient
+                                style={
+                                    {
+                                        width: "80%",
+                                        height: 40,
+                                        borderRadius: 10,
+                                        elevation: 2,
+                                        alignItems: "center",
+                                        justifyContent: "center"
+                                    }
+                                }
+                                //colors={["#99e6ae", "#009de0", "#28094d", "#00b395"]}
+                                colors={["#00b395", "#28094d", "#f4a3af"]}
+                                start={{ x: 0, y: 1 }}
+                                end={{ x: 1, y: 1 }}
+                            >
+                                <TouchableOpacity style={
+                                    {
+                                        height: "100%",
+                                        width: "100%",
+                                        alignItems: "center",
+                                        justifyContent: "center"
+                                    }
+                                } onPress={() => verificationRequest()}>
+                                    {isloaded ?
+                                        <ActivityIndicator
+                                            visible={isloaded}
+                                            color="#fff"
+                                        /> :
+
+                                        <Text style={{ color: "#fff", fontSize: 18, letterSpacing: 7 }}>Vérifier</Text>
+                                    }
+                                </TouchableOpacity>
+
+                            </LinearGradient>
+                        </>
+                        :
+                        <LinearGradient
+                            style={
+                                {
+                                    width: "80%",
+                                    height: 40,
+                                    borderRadius: 10,
+                                    elevation: 2,
+                                    alignItems: "center",
+                                    justifyContent: "center"
+                                }
+                            }
+                            //colors={["#99e6ae", "#009de0", "#28094d", "#00b395"]}
+                            colors={["#f4a3af", "#28094d", "#00b395"]}
+                            start={{ x: 0, y: 1 }}
+                            end={{ x: 1, y: 1 }}
+                        >
+                            <TouchableOpacity style={
+                                {
+                                    height: "100%",
+                                    width: "100%",
+                                    alignItems: "center",
+                                    justifyContent: "center"
+                                }
+                            } onPress={() => setTackpi(true)}>
+                                <Text style={{ color: "#fff", fontSize: 18, letterSpacing: 7 }}>Procéder</Text>
+                            </TouchableOpacity>
+
+                        </LinearGradient>
+                    }
+
 
                 </LinearGradient>
             }
