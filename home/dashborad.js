@@ -9,6 +9,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Instapay } from '../database/database';
 import { useFocusEffect } from "@react-navigation/native"
 import axios from "axios";
+import { Camera, CameraType } from 'expo-camera';
 
 const HEIGHT = Dimensions.get("window").height;
 
@@ -18,19 +19,31 @@ export default function DashBoard({ navigation }) {
     const [isloaded, setIsLoaded] = useState(false);
     const [token, setToken] = useState();
     const [instapaytoken, setInstapaytoken] = useState();
-    const [hasPermission, setHasPermission] = useState(null);
-    const [cameraRef, setCameraRef] = useState(null);
+    const [tackpi, setTackpi] = useState(false);
+
+
+
     const [base64Image, setBase64Image] = useState(null);
+    const [cameraType, setCameraType] = useState(CameraType.back);
+    const [permission, requestPermission] = Camera.useCameraPermissions();
 
 
 
-    useEffect(() => {
+
+    function toggleCameraType() {
+        setCameraType(current => (current === CameraType.back ? CameraType.front : CameraType.back));
+    }
+
+    /*useEffect(() => {
         (async () => {
             const { status } = await Camera.requestPermissionsAsync();
             setHasPermission(status === 'granted');
         })();
     }, []);
 
+    if (!permission) requestPermission(Camera.useCameraPermissions())
+
+    if (!permission.granted) requestPermission(Camera.useCameraPermissions())*/
 
     useFocusEffect(
         useCallback(() => {
@@ -99,25 +112,24 @@ export default function DashBoard({ navigation }) {
 
     return (
         <>
-            {5 > 6 ?
-                <View style={{ flex: 1 }}>
-                    <Camera
-                        style={{ flex: 1 }}
-                        type={Camera.Constants.Type.back}
-                        ref={(ref) => setCameraRef(ref)}
-                    />
-                    <View style={{ flex: 0, flexDirection: 'row', justifyContent: 'center' }}>
-                        <Button onPress={takePicture} title="Take Picture" />
-                    </View>
-                    {base64Image && (
-                        <View style={{ flex: 1 }}>
-                            {/* Display the base64 image */}
-                            <Image
-                                source={{ uri: `data:image/jpeg;base64,${base64Image}` }}
-                                style={{ width: '100%', height: '100%' }}
-                            />
+            {tackpi ?
+                <View style={hilai.containercom}>
+                    <Camera style={hilai.camera} type={cameraType} faceDetectorSettings={{
+                        mode: FaceDetector.FaceDetectorMode.fast,
+                        detectLandmarks: FaceDetector.FaceDetectorLandmarks.all,
+                        runClassifications: FaceDetector.FaceDetectorClassifications.all,
+                        minDetectionInterval: 125,
+                        tracking: true,
+                    }}>
+
+
+
+                        <View style={hilai.buttonContainer}>
+                            <TouchableOpacity style={hilai.button} onPress={toggleCameraType}>
+                                <Text style={hilai.text}>Flip Camera</Text>
+                            </TouchableOpacity>
                         </View>
-                    )}
+                    </Camera>
                 </View>
                 :
 
@@ -188,7 +200,16 @@ export default function DashBoard({ navigation }) {
                         start={{ x: 0, y: 1 }}
                         end={{ x: 1, y: 1 }}
                     >
-                        <Text style={{ color: "#fff", fontSize: 18, letterSpacing: 7 }}>Procéder</Text>
+                        <TouchableOpacity style={
+                            {
+                                height: "100%",
+                                width: "100%",
+                                alignItems: "center",
+                                justifyContent: "center"
+                            }
+                        } onPress={() => setTackpi(zo => !zo)}>
+                            <Text style={{ color: "#fff", fontSize: 18, letterSpacing: 7 }}>Procéder</Text>
+                        </TouchableOpacity>
 
                     </LinearGradient>
 
@@ -208,5 +229,33 @@ const hilai = StyleSheet.create({
         justifyContent: 'center',
         overflow: 'scroll'
     },
+
+
+    /**@@@@@@@@@@@@@@@@@@@@@@ camera @@@@@@@@@@@@@@@@@ */
+
+    containercom: {
+        flex: 1,
+        justifyContent: 'center',
+    },
+    camera: {
+        flex: 1,
+    },
+    buttonContainer: {
+        flex: 1,
+        flexDirection: 'row',
+        backgroundColor: 'transparent',
+        margin: 64,
+    },
+    button: {
+        flex: 1,
+        alignSelf: 'flex-end',
+        alignItems: 'center',
+    },
+    text: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: 'white',
+    },
+
 
 });
