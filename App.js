@@ -2,7 +2,7 @@ import React from 'react';
 
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
-import { LoadingPage, WeLcome, ConneXion, DashBoard } from './home';
+import { LoadingPage, WeLcome, ConneXion, DashBoard, Cameran } from './home';
 
 const Page = createStackNavigator();
 
@@ -39,6 +39,15 @@ export default function App() {
         <Page.Screen
           name="Connexion"
           component={ConneXion}
+          options={{
+            headerShown: false
+          }}
+        />
+
+
+        <Page.Screen
+          name="Cameran"
+          component={Cameran}
           options={{
             headerShown: false
           }}

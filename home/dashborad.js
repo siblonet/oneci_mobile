@@ -9,7 +9,6 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Instapay } from '../database/database';
 import { useFocusEffect } from "@react-navigation/native"
 import axios from "axios";
-import { Camera, CameraType } from 'expo-camera';
 
 const HEIGHT = Dimensions.get("window").height;
 
@@ -21,29 +20,6 @@ export default function DashBoard({ navigation }) {
     const [instapaytoken, setInstapaytoken] = useState();
     const [tackpi, setTackpi] = useState(false);
 
-
-
-    const [base64Image, setBase64Image] = useState(null);
-    const [cameraType, setCameraType] = useState(CameraType.back);
-    const [permission, requestPermission] = Camera.useCameraPermissions();
-
-
-
-
-    function toggleCameraType() {
-        setCameraType(current => (current === CameraType.back ? CameraType.front : CameraType.back));
-    }
-
-    /*useEffect(() => {
-        (async () => {
-            const { status } = await Camera.requestPermissionsAsync();
-            setHasPermission(status === 'granted');
-        })();
-    }, []);
-
-    if (!permission) requestPermission(Camera.useCameraPermissions())
-
-    if (!permission.granted) requestPermission(Camera.useCameraPermissions())*/
 
     useFocusEffect(
         useCallback(() => {
@@ -87,49 +63,11 @@ export default function DashBoard({ navigation }) {
     );
 
 
-
-
-
-
-
-
-
-    const takePicture = async () => {
-        if (cameraRef) {
-            const data = await cameraRef.takePictureAsync();
-
-            // Convert image to base64
-            const base64 = await FileSystem.readAsStringAsync(data.uri, {
-                encoding: FileSystem.EncodingType.Base64,
-            });
-
-            setBase64Image(base64);
-        }
-    };
-
-
-
-
     return (
         <>
             {tackpi ?
-                <View style={hilai.containercom}>
-                    <Camera style={hilai.camera} type={cameraType} faceDetectorSettings={{
-                        mode: FaceDetector.FaceDetectorMode.fast,
-                        detectLandmarks: FaceDetector.FaceDetectorLandmarks.all,
-                        runClassifications: FaceDetector.FaceDetectorClassifications.all,
-                        minDetectionInterval: 125,
-                        tracking: true,
-                    }}>
+                <View style={{}}>
 
-
-
-                        <View style={hilai.buttonContainer}>
-                            <TouchableOpacity style={hilai.button} onPress={toggleCameraType}>
-                                <Text style={hilai.text}>Flip Camera</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </Camera>
                 </View>
                 :
 
@@ -207,7 +145,7 @@ export default function DashBoard({ navigation }) {
                                 alignItems: "center",
                                 justifyContent: "center"
                             }
-                        } onPress={() => setTackpi(zo => !zo)}>
+                        } onPress={() => navigation.navigate("Cameran")}>
                             <Text style={{ color: "#fff", fontSize: 18, letterSpacing: 7 }}>Procéder</Text>
                         </TouchableOpacity>
 
@@ -231,31 +169,57 @@ const hilai = StyleSheet.create({
     },
 
 
-    /**@@@@@@@@@@@@@@@@@@@@@@ camera @@@@@@@@@@@@@@@@@ */
-
-    containercom: {
-        flex: 1,
-        justifyContent: 'center',
-    },
-    camera: {
-        flex: 1,
-    },
-    buttonContainer: {
-        flex: 1,
-        flexDirection: 'row',
-        backgroundColor: 'transparent',
-        margin: 64,
-    },
-    button: {
-        flex: 1,
-        alignSelf: 'flex-end',
-        alignItems: 'center',
-    },
-    text: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: 'white',
-    },
-
 
 });
+
+/*useEffect(() => {
+     (async () => {
+         const { status } = await Camera.requestPermissionsAsync();
+         setHasPermission(status === 'granted');
+     })();
+ }, []);
+
+ if (!permission) requestPermission(Camera.useCameraPermissions())
+
+ if (!permission.granted) requestPermission(Camera.useCameraPermissions())*/
+
+/*  useFocusEffect(
+      useCallback(() => {
+          oneci.transaction(function (txn) {
+              txn.executeSql(
+                  "SELECT name FROM sqlite_master WHERE type='table' AND name='oneci_instapay'",
+                  [],
+                  function (tx, res) {
+                      if (res.rows.length == 0) {
+                          txn.executeSql('DROP TABLE IF EXISTS oneci_instapay', []);
+                          txn.executeSql(
+                              "CREATE TABLE IF NOT EXISTS oneci_instapay(id INTEGER PRIMARY KEY AUTOINCREMENT, token VARCHAR(1000), instapaytoken VARCHAR(1000))",
+                              []);
+                          setIsLoaded(false);
+                          console.log("deleted and created");
+
+                      } else {
+                          txn.executeSql(
+                              "SELECT * FROM oneci_instapay WHERE id ='1'",
+                              [],
+                              (tx, results) => {
+                                  if (results.rows.length == 1) {
+
+                                      setToken(results.rows._array[0].token)
+                                      setInstapaytoken(results.rows._array[0].instapaytoken)
+
+                                  } else {
+                                      setIsLoaded(false)
+                                  }
+                              }
+
+                          );
+
+                      }
+
+                  }
+              );
+          });
+
+      }, [])
+  );*/
