@@ -2,12 +2,17 @@ export const avatar = require("../assets/icons/avatay.png");
 
 
 export const logo = require("../assets/icons/logo.png");
+export const loadingd = require("../assets/icons/loadingd.gif");
 
 
 
 export const fingerprint = require("../assets/icons/fingerprint.png");
 export const faceid = require("../assets/icons/faceid.png");
 
+export const park_success = require("../assets/icons/park_success.png");
+
+
+export const rejected = require("../assets/icons/rejected.png");
 
 
 export default {
@@ -43,7 +48,7 @@ export default {
 
 
     // H
- 
+
 
 
 
@@ -61,8 +66,8 @@ export default {
 
 
     // L
-    logo
-
+    logo,
+loadingd,
 
     // M
 
@@ -80,7 +85,7 @@ export default {
 
 
     // P
-
+    park_success,
 
 
 
@@ -89,7 +94,7 @@ export default {
 
 
     // R
-
+    rejected,
 
 
     // S

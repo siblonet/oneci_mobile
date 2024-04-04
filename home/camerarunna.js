@@ -1,17 +1,20 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Camera, CameraType } from 'expo-camera';
-import { Button, StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View, ActivityIndicator } from 'react-native';
 import * as FaceDetector from 'expo-face-detector';
 import {
     Ionicons
 } from '@expo/vector-icons';
 import { LinearGradient } from "expo-linear-gradient";
+import { StatusBar } from 'expo-status-bar';
 
 
 export default function Cameran(act) {
     const [type, setType] = useState(CameraType.front);
     const [permission, requestPermission] = Camera.useCameraPermissions();
     const [HasPermission, setHasPermission] = useState(permission);
+    const [picturing, setPicturing] = useState(false);
+
     const cameraRef = useRef(null);
 
 
@@ -53,6 +56,7 @@ export default function Cameran(act) {
     }
 
     const shootPicture = async () => {
+        setPicturing(true);
         if (cameraRef.current) {
             let photo = await cameraRef.current.takePictureAsync();
             act.setCapturedImage(photo.uri);
@@ -62,6 +66,8 @@ export default function Cameran(act) {
 
     return (
         <View style={hilai.container}>
+            <StatusBar animated={true} style="light" backgroundColor="transparent" />
+
             <Camera style={hilai.camera} type={type} ref={cameraRef}
             //onFacesDetected={handleFacesDetected}
             /*faceDetectorSettings={{
@@ -122,6 +128,15 @@ export default function Cameran(act) {
                                 borderRadius: 17,
                             }
                         } onPress={() => shootPicture()}>
+                            {picturing ?
+                                <ActivityIndicator
+                                    visible={picturing}
+                                    color="#00b395"
+                                    size={"large"}
+                                /> :
+
+                                <Text style={{}}></Text>
+                            }
                         </TouchableOpacity>
                     </LinearGradient>
 
