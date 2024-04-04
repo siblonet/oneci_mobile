@@ -36,5 +36,8 @@
   "devDependencies": {
     "@babel/core": "^7.20.0"
   },
-  "private": true
+  "private": true,
+  "description": "Cteet application vous permet de verifier authensité d'une cart didentité national",
+  "author": "John Kokar",
+  "license": "ISC"
 }

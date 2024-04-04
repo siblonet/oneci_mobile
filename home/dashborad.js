@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { StyleSheet, Text, View, Image, TouchableOpacity, Animated, TextInput, ActivityIndicator, Alert, AppState } from 'react-native';
 import {
     Ionicons, MaterialCommunityIcons
