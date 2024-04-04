@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from "react";
-import { StyleSheet, Text, View, Image, TouchableOpacity, Animated, TextInput, ActivityIndicator, Alert } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, Animated, TextInput, ActivityIndicator, Alert, AppState } from 'react-native';
 import {
     Ionicons, MaterialCommunityIcons
 } from '@expo/vector-icons';
@@ -28,6 +28,7 @@ export default function DashBoard({ navigation }) {
     const [unlock, setUnlock] = useState(false);
     const [wrong, setWrong] = useState(new Animated.Value(0));
     const [colar, setColor] = useState("#00b395");
+    const [appState, setAppState] = useState(AppState.currentState);
 
 
 
@@ -82,6 +83,28 @@ export default function DashBoard({ navigation }) {
 
         }, [])
     );
+
+
+
+
+
+    useEffect(() => {
+        const handleAppStateChange = (nextAppState) => {
+            setUnlock(false);
+            setPincode("");
+            setAppState(nextAppState);
+        };
+
+        const subscription = AppState.addEventListener('change', handleAppStateChange);
+
+        return () => {
+            subscription.remove();
+        };
+    }, []);
+
+
+
+
 
 
 
