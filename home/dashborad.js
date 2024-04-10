@@ -12,7 +12,7 @@ import axios from "axios";
 import Cameran from './camerarunna';
 import * as FileSystem from 'expo-file-system';
 import * as SecureStore from 'expo-secure-store';
-
+import * as ImagePicker from 'expo-image-picker';
 
 const oneci = Instapay.getOneci();
 
@@ -168,7 +168,7 @@ export default function DashBoard({ navigation }) {
 
 
     function Bearerfetcher() {
-        if (nni && capturedImage) {
+        //if (nni && capturedImage) {
             setIsLoaded(true);
             axios.get(`${routx.tunal}instapay/instapay`).then(answ => {
                 if (answ.data.instapaytoken) {
@@ -185,40 +185,69 @@ export default function DashBoard({ navigation }) {
                 Alert.alert("Erreur", "Verifier que vous avez internet");
 
             });
-        } else {
-            alert("NNI est obligatoire")
-        }
+        //} else {
+            //alert("NNI est obligatoire")
+       // }
     }
+
+
 
     const verificationRequest = async (Bearer) => {
         try {
-            const base64 = await FileSystem.readAsStringAsync(capturedImage, { encoding: FileSystem.EncodingType.Base64 });
-            const identity = {
-                NNI: nni,
-                BIOMETRIC_TYPE: "AUTH_FACE",
-                BIOMETRIC_TYPE: base64
-            };
+            // Ask for permission to access the user's image library
+            const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+            if (status !== 'granted') {
+                console.log('Permission to access media library denied');
+                return;
+            }
 
-            const setting = { headers: { 'Authorization': `Bearer ${Bearer}` } };
-
-            axios.post(`${routx.rnppUrl}/oneci/face-auth`, identity, setting).then(answ => {
-                setAccepted(true);
-                setRejected(false);
-                console.log("gcg", answ.data);
-                setIsLoaded(false);
-            }).catch(error => {
-                setRejected(true);
-                setAccepted(false);
-                console.log("erro", error);
-                setIsLoaded(false);
+            // Launch the image picker to allow the user to select an image
+            const result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                allowsEditing: false,
+                aspect: [1, 1],
+                quality: 1,
+                base64: true,
             });
 
+            if (!result.cancelled) {
+                // Get the local URI of the selected image
+                //console.log(result.assets[0].base64);
+                //const localUri = result.uri;
+
+                // Convert the local URI to base64
+                //const base64 = await FileSystem.readAsStringAsync(localUri, { encoding: FileSystem.EncodingType.Base64 });
+
+                // Construct the identity object with the correct properties
+                const identity = {
+                    NNI: "11777332107",
+                    BIOMETRIC_TYPE: "AUTH_FACE",
+                    BIOMETRIC_DATA: result.assets[0].base64
+                };
+
+
+                // Set the request headers
+                const setting = { headers: { 'Authorization': `Bearer ${Bearer}` } };
+
+                // Send the verification request
+                axios.post(`${routx.rnppUrl}/oneci/face-auth`, identity, setting)
+                    .then(answ => {
+                        setAccepted(true);
+                        setRejected(false);
+                        console.log("Response:", answ.data);
+                        setIsLoaded(false);
+                    })
+                    .catch(error => {
+                        setRejected(true);
+                        setAccepted(false);
+                        console.log("Error:", error);
+                        setIsLoaded(false);
+                    });
+            }
         } catch (error) {
-            console.error("Error converting image to base64:", error);
+            console.error("Error:", error);
         }
-
     };
-
 
 
 
@@ -626,7 +655,7 @@ export default function DashBoard({ navigation }) {
                                             alignItems: "center",
                                             justifyContent: "center"
                                         }
-                                    } onPress={() => setTackpi(true)}>
+                                    } onPress={() => Bearerfetcher()}>
                                         <Text style={{ color: "#fff", fontSize: 18, letterSpacing: 7 }}>Procéder</Text>
                                     </TouchableOpacity>
 
