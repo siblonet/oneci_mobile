@@ -75,14 +75,19 @@ export default function ConneXion({ navigation }) {
 
 
     const saveData = async () => {
+        const yeahpermi = await SecureStore.getItemAsync('yeah');
+
         if (pincode.length == 5) {
             try {
+                if (!yeahpermi) {
+                    await SecureStore.setItemAsync('yeah', '5');
+                }
                 await SecureStore.setItemAsync('oneci', pincode);
                 navigation.navigate("Home");
             } catch (error) {
                 console.log('Error saving data:', error);
             }
-        }else{
+        } else {
             alert("5 chiffres pour le verrouillage de l'app")
         }
 
@@ -358,6 +363,7 @@ export default function ConneXion({ navigation }) {
                         placeholderTextColor={'#aaa'}
                         placeholder={'Créez un code a 5 chiffres'}
                         value={pincode}
+                        maxLength={5}
                         keyboardType="numeric"
                         onChangeText={text => setPincode(text)}
                     />
